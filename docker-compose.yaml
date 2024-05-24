@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  nolzapan-api:
+    image: nolzapan-api
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    ports:
+      - "19001:8000"
+    volumes:
+      - ./api:/nolzapan/api
+    environment:
+      - NOLZA_APP_ENVIRONMENT=${NOLZA_APP_ENVIRONMENT}
+      - NOLZA_LOG_LEVEL=${NOLZA_LOG_LEVEL}
+      - NOLZA_MONGO_HOST=${NOLZA_MONGO_HOST}
+      - NOLZA_MONGO_PORT=${NOLZA_MONGO_PORT}
+      - NOLZA_MONGO_DB=${NOLZA_MONGO_DB}
+      - NOLZA_DATA_API_TOKEN=${NOLZA_DATA_API_TOKEN}
+      - NOLZA_ENABLE_CORS=${NOLZA_ENABLE_CORS}
+      - NOLZA_CORS_ORIGINS=${NOLZA_CORS_ORIGINS}
+    depends_on:
+      mongodb:
+        condition: service_started
+  nolzapan-proxy:
+    container_name: nolzapan-proxy
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    ports:
+      - "19000:80"
+    depends_on:
+      - nolzapan-api
