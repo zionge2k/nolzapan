@@ -116,3 +116,12 @@ class FestivalSchedule(BaseModel):
     sigungucode: Annotated[str, Field(..., description="시군구코드", examples=["2"])]
     tel: Annotated[str, Field(..., description="전화번호", examples=["055-945-8455~6"])]
     title: Annotated[str, Field(..., description="제목", examples=["거창국제연극제"])]
+
+
+class AreaCode(BaseModel):
+    """
+    지역코드목록
+    """
+    rnum: Annotated[int, Field(..., description="Real Number", examples=[1])]
+    code: Annotated[str, Field(...,  description="Code", examples=["1"])]
+    name: Annotated[str, Field(..., description="지역명", examples=["서울"])]
