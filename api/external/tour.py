@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 from enum import Enum
+from typing import Optional
 
 from aiohttp import ClientSession
 from pytz import timezone
@@ -80,13 +81,37 @@ class TourInfo(DataGoKr):
         print(f"{content = }")
         return DataGovKrResponse(**content)
 
-    async def get_areacode(self):
+    async def get_area_code(
+            self,
+            numOfRows: int = 10,
+            pageNo: int = 1,
+            areaCode: Optional[str] = "",
+            **_kwargs,
+        ):
         """
         다른 API 호출에 필요한 지역코드를 받아옵니다.
 
         TODO: 지역코드를 가져오는 API 구현
         """
-        raise NotImplementedError("Not implemented yet")
+        API_PATH = "areaCode1"
+        params = {
+            "numOfRows": numOfRows,
+            "pageNo": pageNo,
+            "areaCode": areaCode,
+            "_type": self.response_type.value,
+            "ServiceKey": self.api_key,
+        } 
+        params.update(self.metadata)
+        params.update(_kwargs)
+        response = await self.session.get(
+            f"{self.ENDPOINT}/{API_PATH}",
+            params=params,
+            headers=self.headers,
+        )
+        content = await response.json()
+        print(f"{content = }")
+        return DataGovKrResponse(**content)
+
 
     async def search_by_keyword(self, keyword: str):
         """
