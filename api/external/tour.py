@@ -60,7 +60,6 @@ class TourInfo(DataGoKr):
         pageNo: int = 1,
         numOfRows: int = 1,
         area: Area | None = None,
-        # TODO: 지역코드별 필터링기능 추가
         **_kwargs,
     ) -> DataGovKrResponse[FestivalSchedule]:
         API_PATH = "searchFestival1"
