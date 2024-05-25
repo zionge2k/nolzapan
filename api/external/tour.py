@@ -5,6 +5,7 @@ from typing import Optional
 from aiohttp import ClientSession
 from pytz import timezone
 
+from api.enums import Area
 from api.schema import DataGovKrResponse, FestivalSchedule
 
 KST = timezone("Asia/Seoul")
@@ -58,15 +59,50 @@ class TourInfo(DataGoKr):
         eventEndDate: date = datetime.now(tz=KST).date() + timedelta(days=90),
         pageNo: int = 1,
         numOfRows: int = 1,
+        area: Area | None = None,
         # TODO: 지역코드별 필터링기능 추가
         **_kwargs,
     ) -> DataGovKrResponse[FestivalSchedule]:
         API_PATH = "searchFestival1"
+        area_code = Area.get_code(area) if area else None
         params = {
             "eventStartDate": eventStartDate.strftime("%Y%m%d"),
             "eventEndDate": eventEndDate.strftime("%Y%m%d"),
             "pageNo": pageNo,
             "numOfRows": numOfRows,
+            "_type": self.response_type.value,
+            "ServiceKey": self.api_key,
+        }
+        params.update(self.metadata)
+        params.update(_kwargs)
+        if area_code:
+            params["areaCode"] = area_code
+
+        response = await self.session.get(
+            f"{self.ENDPOINT}/{API_PATH}",
+            params=params,
+            headers=self.headers,
+        )
+        content = await response.json()
+        return DataGovKrResponse(**content)
+
+    async def get_area_code(
+        self,
+        numOfRows: int = 10,
+        pageNo: int = 1,
+        areaCode: Optional[str] = "",
+        **_kwargs,
+    ):
+        """
+        다른 API 호출에 필요한 지역코드를 받아옵니다.
+
+        TODO: 지역코드를 가져오는 API 구현
+        """
+        API_PATH = "areaCode1"
+        params = {
+            "numOfRows": numOfRows,
+            "pageNo": pageNo,
+            "areaCode": areaCode,
             "_type": self.response_type.value,
             "ServiceKey": self.api_key,
         }
@@ -80,38 +116,6 @@ class TourInfo(DataGoKr):
         content = await response.json()
         print(f"{content = }")
         return DataGovKrResponse(**content)
-
-    async def get_area_code(
-            self,
-            numOfRows: int = 10,
-            pageNo: int = 1,
-            areaCode: Optional[str] = "",
-            **_kwargs,
-        ):
-        """
-        다른 API 호출에 필요한 지역코드를 받아옵니다.
-
-        TODO: 지역코드를 가져오는 API 구현
-        """
-        API_PATH = "areaCode1"
-        params = {
-            "numOfRows": numOfRows,
-            "pageNo": pageNo,
-            "areaCode": areaCode,
-            "_type": self.response_type.value,
-            "ServiceKey": self.api_key,
-        } 
-        params.update(self.metadata)
-        params.update(_kwargs)
-        response = await self.session.get(
-            f"{self.ENDPOINT}/{API_PATH}",
-            params=params,
-            headers=self.headers,
-        )
-        content = await response.json()
-        print(f"{content = }")
-        return DataGovKrResponse(**content)
-
 
     async def search_by_keyword(self, keyword: str):
         """
