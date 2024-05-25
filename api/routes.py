@@ -45,18 +45,11 @@ async def get_tour_info(
         alias="num_of_rows",
         example=10,
     ),
-    # NOTE:
-    # Annotated[Area | None, Query(...)] 와 같이 작성하는경우
-    # docs에 query param 예시가 나오지않음
-    # fastapi issue인 것 같아서 issue 등록해도될듯
-    # https://github.com/tiangolo/fastapi/issues
-    area: Annotated[
-        Area,
-        Query(
-            description="지역명",
-            example=Area.SEOUL,
-        ),
-    ] = None,  # type: ignore
+    area: Area = Query(
+        None,
+        description="지역명",
+        example=Area.SEOUL,
+    ),
 ) -> schema.DataGovKrResponse[schema.FestivalSchedule]:
     """
     TODO:   현재 공공데이터 포털로부터 받은 정보 그대로 반환하고 있음
