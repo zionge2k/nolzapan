@@ -6,7 +6,7 @@ authors = ["d3fau1t <aciddust20@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11.9"
 pydantic = "^2.7.1"
 pydantic-settings = "^2.2.1"
 fastapi = "^0.111.0"
