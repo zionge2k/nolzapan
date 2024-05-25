@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from typing import Optional
 
 from aiohttp import ClientSession, ClientTimeout
 from fastapi import APIRouter, Query, status
@@ -56,3 +57,39 @@ async def get_tour_info(
                 numOfRows=numOfRows,
             )
             return result
+
+
+@router.get(
+    "/areaCode",
+    response_model=schema.DataGovKrResponse[schema.AreaCode],
+    status_code=status.HTTP_200_OK,
+)
+async def get_area_code(
+    pageNo: int = Query(
+        1,
+        description="페이지 번호",
+        alias="page_no",
+        example=1,
+    ),
+    numOfRows: int = Query(
+        10,
+        description="한 페이지 결과 수",
+        alias="num_of_rows",
+        example=10,
+    ),
+    areaCode: Optional[str] = Query(
+       "",
+       description='지역코드',
+       alias='area_code',
+       example="",
+    )
+) -> schema.DataGovKrResponse[schema.AreaCode]:
+    async with ClientSession(timeout=ClientTimeout(5)) as session:
+        async with TourInfo(env.data_api_token, session) as tour:
+            result = await tour.get_area_code(
+                pageNo=pageNo,
+                numOfRows=numOfRows,
+                areaCode=areaCode,
+            )
+            return result
+        
