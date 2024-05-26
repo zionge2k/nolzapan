@@ -1,16 +1,20 @@
 from datetime import date, timedelta
-from typing import Optional
+from typing import Annotated, Optional
 
 from aiohttp import ClientSession, ClientTimeout
 from fastapi import APIRouter, Query, status
 
 from api import schema
+from api.enums import Area
 from api.external.tour import TourInfo
 from api.settings import env
 
 router = APIRouter()
 
 
+# NOTE: /tour 라는 이름 말고 festival 정도로 바꾸는게 좋아보입니다.
+# 초기 프로토타이핑 당시 관광공사 API를 활용한다는 맥락에서 /tour로 이름을 지었지만
+# 사용목적은 축제 정보를 제공하는 것이기 때문에 /festival로 변경하는게 좋아보입니다.
 @router.get(
     "/tour",
     response_model=schema.DataGovKrResponse[schema.FestivalSchedule],
@@ -41,6 +45,11 @@ async def get_tour_info(
         alias="num_of_rows",
         example=10,
     ),
+    area: Area = Query(
+        None,
+        description="지역명",
+        example=Area.SEOUL,
+    ),
 ) -> schema.DataGovKrResponse[schema.FestivalSchedule]:
     """
     TODO:   현재 공공데이터 포털로부터 받은 정보 그대로 반환하고 있음
@@ -55,6 +64,7 @@ async def get_tour_info(
                 eventEndDate=eventEndDate,
                 pageNo=pageNo,
                 numOfRows=numOfRows,
+                area=area,
             )
             return result
 
@@ -78,11 +88,11 @@ async def get_area_code(
         example=10,
     ),
     areaCode: Optional[str] = Query(
-       "",
-       description='지역코드',
-       alias='area_code',
-       example="",
-    )
+        "",
+        description="지역코드",
+        alias="area_code",
+        example="",
+    ),
 ) -> schema.DataGovKrResponse[schema.AreaCode]:
     async with ClientSession(timeout=ClientTimeout(5)) as session:
         async with TourInfo(env.data_api_token, session) as tour:
@@ -92,4 +102,3 @@ async def get_area_code(
                 areaCode=areaCode,
             )
             return result
-        

@@ -5,7 +5,7 @@
 
 from typing import Annotated, Generic, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 T = TypeVar("T")
 
@@ -36,6 +36,13 @@ class DataGovKrResponseBody(BaseModel, Generic[T]):
     numOfRows: int
     pageNo: int
     totalCount: int
+
+    @field_validator("items", mode="before")
+    def check_items(cls, v):
+        print("check_items", v)
+        if not v:
+            return ItemContent[T](item=[])
+        return v
 
 
 class DataGovKrContent(BaseModel, Generic[T]):
@@ -122,6 +129,7 @@ class AreaCode(BaseModel):
     """
     지역코드목록
     """
+
     rnum: Annotated[int, Field(..., description="Real Number", examples=[1])]
-    code: Annotated[str, Field(...,  description="Code", examples=["1"])]
+    code: Annotated[str, Field(..., description="Code", examples=["1"])]
     name: Annotated[str, Field(..., description="지역명", examples=["서울"])]
