@@ -16,11 +16,11 @@ router = APIRouter()
 # 초기 프로토타이핑 당시 관광공사 API를 활용한다는 맥락에서 /tour로 이름을 지었지만
 # 사용목적은 축제 정보를 제공하는 것이기 때문에 /festival로 변경하는게 좋아보입니다.
 @router.get(
-    "/tour",
+    "/festival",
     response_model=schema.DataGovKrResponse[schema.FestivalSchedule],
     status_code=status.HTTP_200_OK,
 )
-async def get_tour_info(
+async def get_festival_info(
     eventStartDate: date = Query(
         ...,
         description="축제 시작일자",
