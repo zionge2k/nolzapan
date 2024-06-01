@@ -1,6 +1,5 @@
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Optional
 
 from aiohttp import ClientSession
 from pytz import timezone
@@ -85,11 +84,11 @@ class TourInfo(DataGoKr):
         content = await response.json()
         return DataGovKrResponse(**content)
 
-    async def get_area_code(
+    async def get_areaCode(
         self,
         numOfRows: int = 10,
         pageNo: int = 1,
-        areaCode: Optional[str] = "",
+        area: Area | None = None,
         **_kwargs,
     ):
         """
@@ -98,13 +97,15 @@ class TourInfo(DataGoKr):
         TODO: 지역코드를 가져오는 API 구현
         """
         API_PATH = "areaCode1"
+        area_code = Area.get_code(area) if area else None
         params = {
             "numOfRows": numOfRows,
             "pageNo": pageNo,
-            "areaCode": areaCode,
             "_type": self.response_type.value,
             "ServiceKey": self.api_key,
         }
+        if area_code:
+            params["areaCode"] = area_code
         params.update(self.metadata)
         params.update(_kwargs)
         response = await self.session.get(

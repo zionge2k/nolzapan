@@ -87,18 +87,17 @@ async def get_area_code(
         alias="num_of_rows",
         example=10,
     ),
-    areaCode: Optional[str] = Query(
-        "",
+    area: Area = Query(
+        None,
         description="지역코드",
-        alias="area_code",
-        example="",
+        example=Area.SEOUL,
     ),
 ) -> schema.DataGovKrResponse[schema.AreaCode]:
     async with ClientSession(timeout=ClientTimeout(5)) as session:
         async with TourInfo(env.data_api_token, session) as tour:
-            result = await tour.get_area_code(
+            result = await tour.get_areaCode(
                 pageNo=pageNo,
                 numOfRows=numOfRows,
-                areaCode=areaCode,
+                area=area,
             )
             return result
