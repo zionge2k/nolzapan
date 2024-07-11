@@ -1,5 +1,4 @@
 from datetime import date, timedelta
-from typing import Annotated, Optional
 
 from aiohttp import ClientSession, ClientTimeout
 from fastapi import APIRouter, Query, status
@@ -12,9 +11,6 @@ from api.settings import env
 router = APIRouter()
 
 
-# NOTE: /tour 라는 이름 말고 festival 정도로 바꾸는게 좋아보입니다.
-# 초기 프로토타이핑 당시 관광공사 API를 활용한다는 맥락에서 /tour로 이름을 지었지만
-# 사용목적은 축제 정보를 제공하는 것이기 때문에 /festival로 변경하는게 좋아보입니다.
 @router.get(
     "/festival",
     response_model=schema.DataGovKrResponse[schema.FestivalSchedule],
