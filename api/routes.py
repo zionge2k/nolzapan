@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/festival",
+    "/행사",
     response_model=schema.DataGovKrResponse[schema.FestivalSchedule],
     status_code=status.HTTP_200_OK,
 )
@@ -66,11 +66,11 @@ async def get_festival_info(
 
 
 @router.get(
-    "/areaCode",
+    "/지역",
     response_model=schema.DataGovKrResponse[schema.AreaCode],
     status_code=status.HTTP_200_OK,
 )
-async def get_area_code(
+async def get_area(
     pageNo: int = Query(
         1,
         description="페이지 번호",
@@ -91,7 +91,7 @@ async def get_area_code(
 ) -> schema.DataGovKrResponse[schema.AreaCode]:
     async with ClientSession(timeout=ClientTimeout(5)) as session:
         async with TourInfo(env.data_api_token, session) as tour:
-            result = await tour.get_areaCode(
+            result = await tour.get_area(
                 pageNo=pageNo,
                 numOfRows=numOfRows,
                 area=area,

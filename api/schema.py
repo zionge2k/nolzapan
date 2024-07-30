@@ -39,6 +39,16 @@ class DataGovKrResponseBody(BaseModel, Generic[T]):
 
     @field_validator("items", mode="before")
     def check_items(cls, v):
+        """
+        items 필드를 검증하고 필요한 경우 기본값을 설정합니다.
+
+        Args:
+            cls: 클래스 자체
+            v: 검증할 값
+
+        Returns:
+            검증 및 처리된 ItemContent 인스턴스
+        """
         print("check_items", v)
         if not v:
             return ItemContent[T](item=[])
@@ -130,6 +140,6 @@ class AreaCode(BaseModel):
     지역코드목록
     """
 
-    rnum: Annotated[int, Field(..., description="Real Number", examples=[1])]
-    code: Annotated[str, Field(..., description="Code", examples=["1"])]
-    name: Annotated[str, Field(..., description="지역명", examples=["서울"])]
+    rnum: Annotated[int, Field(..., description="Real 지역코드", examples=[1])]
+    code: Annotated[str, Field(..., description="지역코드", examples=["1"])]
+    name: Annotated[str, Field(..., description="지역명", examples=["강남구"])]

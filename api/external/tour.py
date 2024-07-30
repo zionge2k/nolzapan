@@ -84,7 +84,7 @@ class TourInfo(DataGoKr):
         content = await response.json()
         return DataGovKrResponse(**content)
 
-    async def get_areaCode(
+    async def get_area(
         self,
         numOfRows: int = 10,
         pageNo: int = 1,
