@@ -4,6 +4,7 @@ from aiohttp import ClientSession, ClientTimeout
 from fastapi import APIRouter, Query, status
 
 from api import schema
+from api.enums import Area
 from api.external.tour import TourInfo
 from api.settings import env
 
@@ -11,11 +12,11 @@ router = APIRouter()
 
 
 @router.get(
-    "/tour",
+    "/행사",
     response_model=schema.DataGovKrResponse[schema.FestivalSchedule],
     status_code=status.HTTP_200_OK,
 )
-async def get_tour_info(
+async def get_festival_info(
     eventStartDate: date = Query(
         ...,
         description="축제 시작일자",
@@ -40,6 +41,11 @@ async def get_tour_info(
         alias="num_of_rows",
         example=10,
     ),
+    area: Area = Query(
+        None,
+        description="지역명",
+        example=Area.SEOUL,
+    ),
 ) -> schema.DataGovKrResponse[schema.FestivalSchedule]:
     """
     TODO:   현재 공공데이터 포털로부터 받은 정보 그대로 반환하고 있음
@@ -54,5 +60,40 @@ async def get_tour_info(
                 eventEndDate=eventEndDate,
                 pageNo=pageNo,
                 numOfRows=numOfRows,
+                area=area,
+            )
+            return result
+
+
+@router.get(
+    "/지역",
+    response_model=schema.DataGovKrResponse[schema.AreaCode],
+    status_code=status.HTTP_200_OK,
+)
+async def get_area(
+    pageNo: int = Query(
+        1,
+        description="페이지 번호",
+        alias="page_no",
+        example=1,
+    ),
+    numOfRows: int = Query(
+        10,
+        description="한 페이지 결과 수",
+        alias="num_of_rows",
+        example=10,
+    ),
+    area: Area = Query(
+        None,
+        description="지역코드",
+        example=Area.SEOUL,
+    ),
+) -> schema.DataGovKrResponse[schema.AreaCode]:
+    async with ClientSession(timeout=ClientTimeout(5)) as session:
+        async with TourInfo(env.data_api_token, session) as tour:
+            result = await tour.get_area(
+                pageNo=pageNo,
+                numOfRows=numOfRows,
+                area=area,
             )
             return result
